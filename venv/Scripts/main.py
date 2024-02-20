@@ -8,10 +8,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 polygon_api_key = 'XLHdBEwveKc6WmYDA7orsTl6soIG_cPb'
-
+origins =[
+    "https://marketbump-frontend.vercel.app/",
+    "marketbump-frontend-git-main-pawelsloboda5s-projects.vercel.app",
+    "http://localhost:5178",
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://marketbump-frontend.vercel.app/"],  # Adjust the origin as per your React app's URL
+    allow_origins=origins,  # Adjust the origin as per your React app's URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
