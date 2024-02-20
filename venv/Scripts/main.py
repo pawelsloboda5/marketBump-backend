@@ -11,7 +11,7 @@ polygon_api_key = 'XLHdBEwveKc6WmYDA7orsTl6soIG_cPb'
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Adjust the origin as per your React app's URL
+    allow_origins=["https://marketbump-frontend.vercel.app/"],  # Adjust the origin as per your React app's URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
