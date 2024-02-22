@@ -10,7 +10,7 @@ app = FastAPI()
 polygon_api_key = 'XLHdBEwveKc6WmYDA7orsTl6soIG_cPb'
 origins =[
     "https://marketbump-frontend.vercel.app",
-    "http://localhost:5173/",
+    "http://localhost:5173",
 ]
 app.add_middleware(
     CORSMiddleware,
