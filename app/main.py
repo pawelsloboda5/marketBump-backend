@@ -9,9 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 polygon_api_key = 'XLHdBEwveKc6WmYDA7orsTl6soIG_cPb'
 origins =[
-    "https://marketbump-frontend.vercel.app/",
-    "https://marketbump-frontend-44qdhky7e-pawelsloboda5s-projects.vercel.app/",
-    "marketbump-frontend-git-main-pawelsloboda5s-projects.vercel.app",
+    "https://marketbump-frontend.vercel.app",
     "http://localhost:5178",
 ]
 app.add_middleware(
