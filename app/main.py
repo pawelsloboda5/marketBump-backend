@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse, HTMLResponse
 import requests
 from fastapi.middleware.cors import CORSMiddleware
+import schedule
+import datetime
 
 
 
@@ -20,31 +22,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/", response_class=HTMLResponse)
-def home():
-    return """
-    <html>
-        <head>
-            <title>News API Home</title>
-        </head>
-        <body>
-            <h1>Welcome to the News API</h1>
-            <button id="loadNewsBtn">Load AMD News</button>
-            <div id="newsContainer"></div>
-            <script>
-                document.getElementById('loadNewsBtn').addEventListener('click', function() {
-                    fetch('https://api.polygon.io/v2/reference/news?ticker=AMD&apiKey=XLHdBEwveKc6WmYDA7orsTl6soIG_cPb')
-                        .then(response => response.text())
-                        .then(html => {
-                            document.getElementById('newsContainer').innerHTML = html;
-                        })
-                        .catch(err => console.error(err));
-                });
-            </script>
-        </body>
-    </html>
-    """
-
 
 def fetch_news_data(ticker: str = "AMD"):
     url = f"https://api.polygon.io/v2/reference/news?ticker={ticker}&apiKey={polygon_api_key}"
@@ -57,11 +34,17 @@ def fetch_news_data(ticker: str = "AMD"):
         return []  # Return an empty list in case of an error
     
 def fetch_stock_data(ticker: str = "AMD"):
-    url = f"https://api.polygon.io/v1/open-close/{ticker}/2024-02-16?adjusted=true&apiKey={polygon_api_key}"
+    today = datetime.date.today().isoformat()  # Get today's date in YYYY-MM-DD format
+    url = f"https://api.polygon.io/v1/open-close/{ticker}/{today}?adjusted=true&apiKey={polygon_api_key}"
     response = requests.get(url)
     if response.status_code == 200:  # Success
-        stock_data_open = response.json()
-        return stock_data_open['open']
+        stock_data = response.json()
+        return {
+            'open': stock_data.get('open'),
+            'close': stock_data.get('close'),
+            'volume': stock_data.get('volume'),
+            'market_cap': stock_data.get('marketcap')
+        }
     else:
         return []  # Return an empty list in case of an error
 def fetch_stock_data_close(ticker: str = "AMD"):
