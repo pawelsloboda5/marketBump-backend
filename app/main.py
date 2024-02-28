@@ -42,17 +42,7 @@ def fetch_stock_data(ticker: str = "AMD"):
         return {
             'open': stock_data.get('open'),
             'close': stock_data.get('close'),
-            'volume': stock_data.get('volume'),
-            'market_cap': stock_data.get('marketcap')
         }
-    else:
-        return []  # Return an empty list in case of an error
-def fetch_stock_data_close(ticker: str = "AMD"):
-    url = f"https://api.polygon.io/v1/open-close/{ticker}/2024-02-16?adjusted=true&apiKey={polygon_api_key}"
-    response = requests.get(url)
-    if response.status_code == 200:  # Success
-        stock_data_close = response.json()
-        return stock_data_close['close']
     else:
         return []  # Return an empty list in case of an error
 
@@ -62,14 +52,13 @@ def get_news(ticker: str = "AMD"):
 @app.get("/api/news/{ticker}", response_class=JSONResponse)
 def get_stock_news(ticker: str = "AMD"):
     news_data = fetch_news_data(ticker)  # Call get_news function to fetch the data
-    stock_data_open = fetch_stock_data(ticker)
-    stock_data_close = fetch_stock_data_close(ticker)
+    stock_data = fetch_stock_data(ticker)
 
     # Construct a JSON response structure
     response_content = {
         "ticker": ticker,
-        "stock_data_open": stock_data_open,
-        "stock_data_close": stock_data_close,  # Ensure this is structured correctly for JSON
+        "stock_data_open": stock_data.get('open'),
+        "stock_data_close": stock_data.get('close'),  # Ensure this is structured correctly for JSON
         "news": news_data  # List of article dictionaries
     }
 
