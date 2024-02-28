@@ -63,3 +63,6 @@ def get_stock_news(ticker: str = "AMD"):
     }
 
     return response_content
+
+
+
