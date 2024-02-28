@@ -42,6 +42,7 @@ def fetch_stock_data(ticker: str = "AMD"):
         return {
             'open': stock_data.get('open'),
             'close': stock_data.get('close'),
+            'high': stock_data.get('high'),
         }
     else:
         return []  # Return an empty list in case of an error
@@ -58,7 +59,8 @@ def get_stock_news(ticker: str = "AMD"):
     response_content = {
         "ticker": ticker,
         "stock_data_open": stock_data.get('open'),
-        "stock_data_close": stock_data.get('close'),  # Ensure this is structured correctly for JSON
+        "stock_data_close": stock_data.get('close'), 
+        "stock_data_high": stock_data.get('high'), # Ensure this is structured correctly for JSON
         "news": news_data  # List of article dictionaries
     }
 
