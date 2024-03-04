@@ -2,29 +2,37 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse, HTMLResponse
 import requests
 from fastapi.middleware.cors import CORSMiddleware
-import datetime
-from datetime import date, timedelta
+from datetime import datetime, timedelta
 from polygon import RESTClient
 from typing import List, Optional
+import pytz
 
 polygon_api_key = 'XLHdBEwveKc6WmYDA7orsTl6soIG_cPb'
 client = RESTClient(polygon_api_key)
 app = FastAPI()
 
-#Get todays date but go back to friday if it is the weekend
-now = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=4)  # Adjust for Eastern Time
 
-# Get today's date, but adjust for the market being closed on weekends
-if now.weekday() > 4:  # Saturday or Sunday
-    # If it's Sunday, go back to Friday
-    if now.weekday() == 6:
-        today = now.date() - timedelta(days=2)
-    # If it's Saturday, also go back to Friday
-    else:
-        today = now.date() - timedelta(days=1)
-else:
-    today = now.date()
+# Define the Eastern Timezone
+eastern = pytz.timezone('US/Eastern')
 
+# Get the current time in UTC and convert it to Eastern Time
+now_utc = datetime.now(pytz.utc)
+now_eastern = now_utc.astimezone(eastern)
+
+# Initialize today as the current date
+today = now_eastern.date()
+
+# Check if it's Monday before 9:30 AM
+if now_eastern.weekday() == 0 and now_eastern.hour < 9:
+    # Adjust to the previous Friday
+    today -= timedelta(days=3)
+# Check if it's Saturday or Sunday
+elif now_eastern.weekday() == 6:  # Sunday
+    today -= timedelta(days=2)
+elif now_eastern.weekday() == 5:  # Saturday
+    today -= timedelta(days=1)
+
+# Convert to ISO format
 today = today.isoformat()
 
 origins =[
