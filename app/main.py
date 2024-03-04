@@ -4,12 +4,22 @@ import requests
 from fastapi.middleware.cors import CORSMiddleware
 import schedule
 import datetime
+from polygon import RESTClient
+from pydantic import BaseModel, HttpUrl
+from typing import List, Optional
 
-
-
-
-app = FastAPI()
 polygon_api_key = 'XLHdBEwveKc6WmYDA7orsTl6soIG_cPb'
+client = RESTClient(polygon_api_key)
+app = FastAPI()
+
+#Get todays date but go back to friday if it is the weekend
+today = datetime.date.today()
+if today.strftime("%w") == "0":
+    today = today - datetime.timedelta(days=2)
+elif today.strftime("%w") == "6":
+    today = today - datetime.timedelta(days=1)
+today = today.isoformat()
+
 origins =[
     "https://marketbump-frontend.vercel.app",
     "http://localhost:5173",
@@ -22,49 +32,48 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+#Variables needed to be fetched from polygon.io
+#Stock data:
+#ticker, day open, day close, day high, day low, volume, scrape realtime quote
+#News data:
+#ticker, title, url, summary, author, keywords
 
-def fetch_news_data(ticker: str = "AMD"):
-    url = f"https://api.polygon.io/v2/reference/news?ticker={ticker}&apiKey={polygon_api_key}"
-    response = requests.get(url)
-    if response.status_code == 200:  # Success
-        news_data = response.json()
-        # Assuming you want to return the articles directly
-        return news_data.get('results', [])  # Safely get 'results' or return empty list
-    else:
-        return []  # Return an empty list in case of an error
+def fetch_day_data(ticker: str, client):
+    day_data = client.get_daily_open_close_agg(ticker, today)
+    if day_data:
+        return day_data
     
-def fetch_stock_data(ticker: str = "AMD"):
-    today = datetime.date.today().isoformat()  # Get today's date in YYYY-MM-DD format
-    url = f"https://api.polygon.io/v1/open-close/{ticker}/{today}?adjusted=true&apiKey={polygon_api_key}"
-    response = requests.get(url)
-    if response.status_code == 200:  # Success
-        stock_data = response.json()
-        return {
-            'open': stock_data.get('open'),
-            'close': stock_data.get('close'),
-            'high': stock_data.get('high'),
-        }
-    else:
-        return []  # Return an empty list in case of an error
 
-def get_news(ticker: str = "AMD"):
-    return fetch_news_data(ticker)
+def fetch_news_data(ticker: str, client):
+    news_data_url = f"https://api.polygon.io/v2/reference/news?limit=9&order=descending&sort=published_utc&ticker={ticker}&published_utc.gte={today}&apiKey={polygon_api_key}"
+    news_data = requests.get(news_data_url).json()
 
-@app.get("/api/news/{ticker}", response_class=JSONResponse)
-def get_stock_news(ticker: str = "AMD"):
-    news_data = fetch_news_data(ticker)  # Call get_news function to fetch the data
-    stock_data = fetch_stock_data(ticker)
+    if news_data:
+        return news_data
+  
 
-    # Construct a JSON response structure
-    response_content = {
+@app.get("/api/stockData/{ticker}", response_class=JSONResponse)
+def get_stock_day_data(ticker: str = "AMD"):
+    day_data = fetch_day_data(ticker, client)
+
+    if not day_data:
+        return JSONResponse(content={"error": "Data could not be fetched"}, status_code=400)
+
+    return {
         "ticker": ticker,
-        "stock_data_open": stock_data.get('open'),
-        "stock_data_close": stock_data.get('close'), 
-        "stock_data_high": stock_data.get('high'), # Ensure this is structured correctly for JSON
-        "news": news_data  # List of article dictionaries
+        "day_data": day_data,
     }
 
-    return response_content
+@app.get("/api/newsData/{ticker}", response_class=JSONResponse)
+def get_stock_news(ticker: str = "AMD"):
+    news_data = fetch_news_data(ticker, client)
 
+    if not news_data:
+        return JSONResponse(content={"error": "Data could not be fetched"}, status_code=400)
+    # Ensure news_data is an array and extract it if it's nested within another object
+    news_data = news_data.get('results', []) if isinstance(news_data, dict) else news_data
 
-
+    return {
+        "ticker": ticker,
+        "news_data": news_data,
+    }
