@@ -7,7 +7,7 @@ from polygon import RESTClient
 from typing import List, Optional
 import pytz
 import uvicorn
-from streamBot import client, get_most_recent_message
+
 import asyncio
 
 app = FastAPI()
