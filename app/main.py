@@ -4,7 +4,6 @@ import requests
 from fastapi.middleware.cors import CORSMiddleware
 import datetime
 from polygon import RESTClient
-from pydantic import BaseModel, HttpUrl
 from typing import List, Optional
 
 polygon_api_key = 'XLHdBEwveKc6WmYDA7orsTl6soIG_cPb'
@@ -38,9 +37,7 @@ app.add_middleware(
 #ticker, title, url, summary, author, keywords
 
 def fetch_day_data(ticker: str, client):
-    day_data_url = f"https://api.polygon.io/v1/open-close/{ticker}/{today}?adjusted=true&apiKey={polygon_api_key}"
-    day_data = requests.get(day_data_url).json()
-    
+    day_data = client.get_daily_open_close_agg(ticker, today)
     if day_data:
         return day_data
     
