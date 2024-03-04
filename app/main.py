@@ -98,20 +98,7 @@ def get_stock_news(ticker: str = "AMD"):
         "news_data": news_data,
     }
 
-@app.get("/api/discord")
-def get_discord_data():
-    message = get_most_recent_message()
-    if message is None:
-        return {"error": "No message available"}
-    return {"message": message}
 
-async def start_bot():
-    await client.start_bot(discord_api_key)
-
-if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.create_task(start_bot())
-    uvicorn.run(app, host="0.0.0.0", port=8000)
 
      
 
