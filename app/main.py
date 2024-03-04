@@ -59,7 +59,8 @@ app.add_middleware(
 #ticker, title, url, summary, author, keywords
 
 def fetch_day_data(ticker: str, client):
-    day_data = client.get_daily_open_close_agg(ticker, today)
+    url = f"https://api.polygon.io/v1/open-close/{ticker}/{today}?adjusted=true&apiKey={polygon_api_key}"
+    day_data = requests.get(url).json()
     if day_data:
         return day_data
     
