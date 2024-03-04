@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse, HTMLResponse
 import requests
 from fastapi.middleware.cors import CORSMiddleware
-import schedule
 import datetime
 from polygon import RESTClient
 from pydantic import BaseModel, HttpUrl
