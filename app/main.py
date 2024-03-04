@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse, HTMLResponse
 import requests
 from fastapi.middleware.cors import CORSMiddleware
 import datetime
+from datetime import date, timedelta
 from polygon import RESTClient
 from typing import List, Optional
 
@@ -11,11 +12,19 @@ client = RESTClient(polygon_api_key)
 app = FastAPI()
 
 #Get todays date but go back to friday if it is the weekend
-today = datetime.date.today()
-if today.strftime("%w") == "0":
-    today = today - datetime.timedelta(days=2)
-elif today.strftime("%w") == "6":
-    today = today - datetime.timedelta(days=1)
+now = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=4)  # Adjust for Eastern Time
+
+# Get today's date, but adjust for the market being closed on weekends
+if now.weekday() > 4:  # Saturday or Sunday
+    # If it's Sunday, go back to Friday
+    if now.weekday() == 6:
+        today = now.date() - timedelta(days=2)
+    # If it's Saturday, also go back to Friday
+    else:
+        today = now.date() - timedelta(days=1)
+else:
+    today = now.date()
+
 today = today.isoformat()
 
 origins =[
