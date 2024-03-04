@@ -6,10 +6,15 @@ from datetime import datetime, timedelta
 from polygon import RESTClient
 from typing import List, Optional
 import pytz
+import uvicorn
+from streamBot import client, get_most_recent_message
+import asyncio
 
+app = FastAPI()
+
+discord_api_key = 'MTIxNDEwNjA0NjQ2MTkwNjk2NA.GeChRC.69zbzxWARdhoantscV_LzSYMJeeM5eJuN_w8PA'
 polygon_api_key = 'XLHdBEwveKc6WmYDA7orsTl6soIG_cPb'
 client = RESTClient(polygon_api_key)
-app = FastAPI()
 
 
 # Define the Eastern Timezone
@@ -60,7 +65,7 @@ def fetch_day_data(ticker: str, client):
     
 
 def fetch_news_data(ticker: str, client):
-    news_data_url = f"https://api.polygon.io/v2/reference/news?limit=9&order=descending&sort=published_utc&ticker={ticker}&published_utc.gte={today}&apiKey={polygon_api_key}"
+    news_data_url = f"https://api.polygon.io/v2/reference/news?limit=3&order=descending&sort=published_utc&ticker={ticker}&published_utc.gte={today}&apiKey={polygon_api_key}"
     news_data = requests.get(news_data_url).json()
 
     if news_data:
@@ -92,3 +97,23 @@ def get_stock_news(ticker: str = "AMD"):
         "ticker": ticker,
         "news_data": news_data,
     }
+
+@app.get("/api/discord")
+def get_discord_data():
+    message = get_most_recent_message()
+    if message is None:
+        return {"error": "No message available"}
+    return {"message": message}
+
+async def start_bot():
+    await client.start_bot(discord_api_key)
+
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+    loop.create_task(start_bot())
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+     
+
+
+
