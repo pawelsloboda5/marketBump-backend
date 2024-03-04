@@ -5,10 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime, timedelta
 from polygon import RESTClient
 from typing import List, Optional
+from pytz import timezone
 import pytz
-import uvicorn
 
-import asyncio
 
 app = FastAPI()
 
