@@ -8,21 +8,21 @@ from typing import List, Optional
 import discord
 from discord import Intents
 import pytz
-from pydantic import BaseModel
 from streamBot import retireve_messages
 
-
+#1198802839217131580
+#MjExMjcxMDg2MDQwNDE2MjU2.Gfjysr.QszGgFIoBxbU7cLWvcEcN29ZGIXDdpPYCtFWKE
+#1193011030100557844
+#MjExMjcxMDg2MDQwNDE2MjU2.GTaVqT.wmnEajKiytq0bvKvHsxm8hQShGHlaSP4JW7Ieg
 app = FastAPI()
 router = APIRouter()
 
 app.include_router(router)
 discord_api_key = 'MTIxNDEwNjA0NjQ2MTkwNjk2NA.GeChRC.69zbzxWARdhoantscV_LzSYMJeeM5eJuN_w8PA'
+discord_auth_key = 'MjExMjcxMDg2MDQwNDE2MjU2.GTaVqT.wmnEajKiytq0bvKvHsxm8hQShGHlaSP4JW7Ieg'
+channel_id = '1198802201355759737'
 polygon_api_key = 'XLHdBEwveKc6WmYDA7orsTl6soIG_cPb'
-channel_id = 1193011030100557844
 client = RESTClient(polygon_api_key)
-
-class Message(BaseModel):
-    message: str
 
 eastern = pytz.timezone('US/Eastern')
 now_utc = datetime.now(pytz.utc)
@@ -100,4 +100,15 @@ def get_stock_news(ticker: str = "AMD"):
         "ticker": ticker,
         "news_data": news_data,
     }
+
+@app.get("/api/discord", response_class=JSONResponse)
+def receive_message():
+    messageData = retireve_messages(channel_id, discord_auth_key)
+    message = messageData[0]
+    author = messageData[1]
+    return {"message": message, 
+            "author": author
+            }
+
+
 
