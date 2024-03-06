@@ -1,46 +1,49 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect, APIRouter
 from fastapi.responses import JSONResponse, HTMLResponse
 import requests
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime, timedelta
 from polygon import RESTClient
 from typing import List, Optional
+import discord
+from discord import Intents
 import pytz
+from pydantic import BaseModel
+from streamBot import retireve_messages
 
 
 app = FastAPI()
+router = APIRouter()
 
+app.include_router(router)
 discord_api_key = 'MTIxNDEwNjA0NjQ2MTkwNjk2NA.GeChRC.69zbzxWARdhoantscV_LzSYMJeeM5eJuN_w8PA'
 polygon_api_key = 'XLHdBEwveKc6WmYDA7orsTl6soIG_cPb'
+channel_id = 1193011030100557844
 client = RESTClient(polygon_api_key)
 
+class Message(BaseModel):
+    message: str
 
-# Define the Eastern Timezone
 eastern = pytz.timezone('US/Eastern')
-
-# Get the current time in UTC and convert it to Eastern Time
 now_utc = datetime.now(pytz.utc)
 now_eastern = now_utc.astimezone(eastern)
 
-# Initialize today as the current date
 today = now_eastern.date()
 
-# Check if it's Monday before 9:30 AM
 if now_eastern.weekday() == 0 and now_eastern.hour < 9:
-    # Adjust to the previous Friday
     today -= timedelta(days=3)
-# Check if it's Saturday or Sunday
 elif now_eastern.weekday() == 6:  # Sunday
     today -= timedelta(days=2)
 elif now_eastern.weekday() == 5:  # Saturday
     today -= timedelta(days=1)
 
-# Convert to ISO format
 today = today.isoformat()
 
 origins =[
     "https://marketbump-frontend.vercel.app",
+    "https://marketbump.io",
     "http://localhost:5173",
+    "http://localhost:8000",
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -96,10 +99,4 @@ def get_stock_news(ticker: str = "AMD"):
         "ticker": ticker,
         "news_data": news_data,
     }
-
-
-
-     
-
-
 
