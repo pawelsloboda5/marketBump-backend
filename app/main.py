@@ -8,7 +8,7 @@ from typing import List, Optional
 import discord
 from discord import Intents
 import pytz
-from streamBot import retireve_messages
+from streamBot import retrieve_messages
 
 #1198802839217131580
 #MjExMjcxMDg2MDQwNDE2MjU2.Gfjysr.QszGgFIoBxbU7cLWvcEcN29ZGIXDdpPYCtFWKE
@@ -103,7 +103,7 @@ def get_stock_news(ticker: str = "AMD"):
 
 @app.get("/api/discord", response_class=JSONResponse)
 def receive_message():
-    messageData = retireve_messages(channel_id, discord_auth_key)
+    messageData = retrieve_messages(channel_id, discord_auth_key)
     message = messageData[0]
     author = messageData[1]
     return {"message": message, 

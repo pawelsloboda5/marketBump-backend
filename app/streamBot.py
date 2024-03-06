@@ -6,7 +6,7 @@ import json
 discord_api_key = 'MTIxNDEwNjA0NjQ2MTkwNjk2NA.GeChRC.69zbzxWARdhoantscV_LzSYMJeeM5eJuN_w8PA'
 discord_auth_key = 'MjExMjcxMDg2MDQwNDE2MjU2.Gfjysr.QszGgFIoBxbU7cLWvcEcN29ZGIXDdpPYCtFWKE'
 
-def retireve_messages(channel_id,discord_auth_key):
+def retrieve_messages(channel_id,discord_auth_key):
     headers = {
         'authorization':'MjExMjcxMDg2MDQwNDE2MjU2.GTaVqT.wmnEajKiytq0bvKvHsxm8hQShGHlaSP4JW7Ieg'
     }
