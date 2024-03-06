@@ -8,8 +8,8 @@ from typing import List, Optional
 import discord
 from discord import Intents
 import pytz
-import streamBot
-from streamBot import retrieve_messages
+from . import streamBot
+from .streamBot import retrieve_messages
 
 #1198802839217131580
 #MjExMjcxMDg2MDQwNDE2MjU2.Gfjysr.QszGgFIoBxbU7cLWvcEcN29ZGIXDdpPYCtFWKE
