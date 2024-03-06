@@ -40,6 +40,7 @@ today = today.isoformat()
 
 origins =[
     "https://marketbump-frontend.vercel.app",
+    "https://marketbump.io",
     "http://localhost:5173",
 ]
 app.add_middleware(
