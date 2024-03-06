@@ -45,6 +45,7 @@ origins =[
     "http://localhost:5173",
     "http://localhost:8000",
 ]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,  # Adjust the origin as per your React app's URL
