@@ -6,10 +6,10 @@ from datetime import datetime, timedelta
 from polygon import RESTClient
 from typing import List, Optional
 import discord
-from discord import Intents
 import pytz
-from . import streamBot
-from .streamBot import retrieve_messages
+import streamBot
+from streamBot import retrieve_messages
+from openAI import summarize_text
 
 #1198802839217131580
 #MjExMjcxMDg2MDQwNDE2MjU2.Gfjysr.QszGgFIoBxbU7cLWvcEcN29ZGIXDdpPYCtFWKE
@@ -23,6 +23,7 @@ discord_api_key = 'MTIxNDEwNjA0NjQ2MTkwNjk2NA.GeChRC.69zbzxWARdhoantscV_LzSYMJee
 discord_auth_key = 'MjExMjcxMDg2MDQwNDE2MjU2.GTaVqT.wmnEajKiytq0bvKvHsxm8hQShGHlaSP4JW7Ieg'
 channel_id = '1198802201355759737'
 polygon_api_key = 'XLHdBEwveKc6WmYDA7orsTl6soIG_cPb'
+openai_api_key = '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'
 client = RESTClient(polygon_api_key)
 
 eastern = pytz.timezone('US/Eastern')
@@ -96,7 +97,11 @@ def get_stock_news(ticker: str = "AMD"):
         return JSONResponse(content={"error": "Data could not be fetched"}, status_code=400)
     # Ensure news_data is an array and extract it if it's nested within another object
     news_data = news_data.get('results', []) if isinstance(news_data, dict) else news_data
-
+    
+     # Summarize each news article
+    for article in news_data:
+        article['description'] = summarize_text(article['description'])
+    
     return {
         "ticker": ticker,
         "news_data": news_data,
